@@ -173,6 +173,47 @@ use common::sense;
 
 use base 'Mojolicious::Controller';
 
+package App::Controller;
+use common::sense;
+
+use base 'Mojolicious::Controller';
+
+sub status {
+	my $self = shift;
+	
+	$self->res->code(shift || 200);
+	$self->rendered;
+}
+
+sub redirect {
+	my $self = shift;
+	
+	$self->res->code(302);
+	$self->res->headers->location( shift || $self->return_url );
+	$self->rendered;
+}
+
+sub return_url {
+	my $self = shift;
+	my $referer = $self->req->headers->header('Referer');
+	
+	return $referer && $referer !~ /login|logout/ ? $referer : '/'; 
+}
+
+sub redirect_accel {
+	my $self = shift;
+	
+	my $url  = shift || return;
+	my $type = shift || '';
+	
+	for ($self->res->headers) {
+		$_->content_type( $type );
+		$_->header( 'X-Accel-Redirect' => $url );
+	}
+	
+	$self->rendered;
+}
+
 1;
 
 @@ controller
@@ -322,7 +363,7 @@ $t->get_ok('/')->status_is(200)->content_type_is('text/html')
         <% if ($self->app->mode eq 'development') { %>
 	        <div>
                 This page was generated from the template
-                "templates/exception.html.ep".
+                "tmpl/exception.html.ep".
             </div>
             <div class="snippet"><pre><%= $e->message %></pre></div>
             <div>
@@ -357,8 +398,8 @@ $t->get_ok('/')->status_is(200)->content_type_is('text/html')
 % layout 'default';
 <h2><%= $message %></h2>
 This page was generated from the template
-"templates/example/welcome.html.ep" and the layout
-"templates/layouts/default.html.ep",
+"tmpl/index/show.html.ep" and the layout
+"tmpl/layouts/default.html.ep",
 <a href="<%== url_for %>">click here</a>
 to reload the page or
 <a href="/index.html">here</a>
