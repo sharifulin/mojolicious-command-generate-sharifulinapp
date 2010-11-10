@@ -410,7 +410,11 @@ __END__
 Mojolicious::Command::Generate::SharifulinApp - App Generator Command Sharifulin Style
 
 =head1 SYNOPSIS
-
+    
+    # generate
+    $ script/mojolicious generate sharifulin_app App
+    
+    # in code
     use Mojolicious::Command::Generate::SharifulinApp;
 
     my $app = Mojolicious::Command::Generate::SharifulinApp->new;
